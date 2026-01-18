@@ -30,7 +30,10 @@ const PaymentService = {
             });
 
             const order = await response.json();
-            if (!order.id) throw new Error("Order creation failed");
+            if (!response.ok || !order.id) {
+                const errMsg = order.error || "Order creation failed";
+                throw new Error(errMsg);
+            }
 
             if (typeof Razorpay === 'undefined') {
                 alert("Payment gateway failed to load. Please check your internet or disable ad-blockers.");
@@ -96,7 +99,20 @@ const PaymentService = {
                                 localStorage.setItem('isLocalPro_' + auth.currentUser.uid, 'true');
                             }
 
-                            alert("Payment successful! You are now a PRO member. 🎉");
+                            // Show success modal instead of alert
+                            const successModal = document.getElementById('payment-success-modal');
+                            if (successModal) {
+                                successModal.style.display = 'flex';
+                                const homeBtn = document.getElementById('btn-payment-home');
+                                if (homeBtn) {
+                                    homeBtn.onclick = () => {
+                                        successModal.style.display = 'none';
+                                        window.location.reload(); // Reload to go home with updated state
+                                    };
+                                }
+                            } else {
+                                alert("Payment successful! You are now a PRO member. 🎉");
+                            }
                             if (onComplete) onComplete();
                         } else {
                             alert("Payment verification failed: " + (result.error || "Unknown Error"));

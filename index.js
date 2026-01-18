@@ -232,15 +232,22 @@ app.get('/api/tags/:tag', async (req, res) => {
 // Step 1: Create Order
 app.post('/api/create-order', async (req, res) => {
     const { amount } = req.body;
+
+    if (!rzp) {
+        console.error("Order creation failed: Razorpay is not initialized. Check your .env keys.");
+        return res.status(500).json({ error: "Razorpay server-side initialization failed. Please contact admin." });
+    }
+
     try {
         const order = await rzp.orders.create({
-            amount: amount * 100, // Razorpay works in paise
+            amount: Math.round(amount * 100), // Ensure integer for paise
             currency: "INR",
             receipt: `receipt_${Date.now()}`
         });
         res.json(order);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Razorpay Order Error:", err);
+        res.status(500).json({ error: err.message || "Failed to create order with Razorpay" });
     }
 });
 
