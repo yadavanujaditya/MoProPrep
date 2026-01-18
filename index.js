@@ -3,6 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 const { parse } = require('csv-parse/sync');
 const path = require('path');
+const fs = require('fs');
 
 // Load environment variables FIRST
 require('dotenv').config();
@@ -71,8 +72,6 @@ const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2XBDgAr
 let cachedData = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-const fs = require('fs');
 
 // Helper: Fetch and Parse Data
 async function getQuestions(forceRefresh = false) {
